@@ -1,0 +1,24 @@
+{
+	"name": "w7/rangine-ds-config",
+	"description": "A Rangine vendor.",
+	"keywords": [
+		"rangine"
+	],
+	"license": "Apache-2.0",
+	"require": {
+		"php": ">=7.2",
+		"w7/rangine": "*"
+	},
+	"autoload": {
+		"psr-4": {
+			"W7\\Config\\": "src/"
+		}
+	},
+	"extra": {
+		"rangine": {
+			"providers": [
+				"W7\\Config\\ServiceProvider"
+			]
+		}
+	}
+}
