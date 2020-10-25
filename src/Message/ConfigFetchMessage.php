@@ -10,7 +10,7 @@
  * visited https://www.rangine.com for more details
  */
 
-namespace W7\Crontab\Message;
+namespace W7\Config\Message;
 
 use W7\Core\Message\TaskMessage;
 
@@ -21,6 +21,4 @@ class ConfigFetchMessage extends TaskMessage {
 	const CONFIG_FETCH_MESSAGE = 'config-fetch';
 
 	public $messageType = self::CONFIG_FETCH_MESSAGE;
-
-	public $name = '';
 }
