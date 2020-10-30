@@ -23,8 +23,8 @@ abstract class ConfigFetcherAbstract {
 			$server = App::$server;
 			for ($processId = 0; $processId <= $server->getPool()->getProcessFactory()->count(); ++$processId) {
 				$process = $server->getPool()->getProcessFactory()->get($processId);
+				//待调整，process中暂时没有类似pipMessage的回调
 				$process && $process->sendMsg($pipeMessage->pack());
-
 			}
 		} elseif (App::$server instanceof SwooleServerAbstract) {
 			$workerCount = App::$server->setting['worker_num'] + App::$server->setting['task_worker_num'] - 1;

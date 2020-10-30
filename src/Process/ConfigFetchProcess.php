@@ -14,6 +14,8 @@ namespace W7\Config\Process;
 
 use Swoole\Process;
 
+use W7\Config\Fetcher\ConfigFetcherAbstract;
+use W7\Core\Facades\Container;
 use W7\Core\Process\ProcessAbstract;
 
 class ConfigFetchProcess extends ProcessAbstract {
@@ -22,6 +24,10 @@ class ConfigFetchProcess extends ProcessAbstract {
 	}
 
 	protected function run(Process $process) {
-
+		/**
+		 * @var ConfigFetcherAbstract $dsConfigFetcher
+		 */
+		$dsConfigFetcher = Container::get('ds-config-fetch');
+		$dsConfigFetcher->fetch();
 	}
 }
