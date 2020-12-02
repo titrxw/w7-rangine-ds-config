@@ -7,7 +7,8 @@
 	"license": "Apache-2.0",
 	"require": {
 		"php": ">=7.2",
-		"w7/rangine": "*"
+		"w7/rangine": "*",
+		"multilinguals/apollo-client": "^0.1.2"
 	},
 	"autoload": {
 		"psr-4": {
