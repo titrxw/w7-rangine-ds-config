@@ -2,13 +2,19 @@
 
 namespace W7\Config\Fetcher;
 
+use Throwable;
 use W7\App;
+use W7\Config\Event\ConfigSyncExceptionEvent;
+use W7\Config\Event\ConfigSyncIngEvent;
 use W7\Config\Task\ConfigSyncTask;
+use W7\Core\Helper\Traiter\AppCommonTrait;
 use W7\Core\Process\ProcessServerAbstract;
 use W7\Core\Server\SwooleServerAbstract;
 use W7\Config\Message\ConfigFetchMessage;
 
 abstract class ConfigFetcherAbstract {
+	use AppCommonTrait;
+
 	abstract public function fetch();
 
 	protected function syncConfig(array $data) {
@@ -29,7 +35,13 @@ abstract class ConfigFetcherAbstract {
 		} elseif (App::$server instanceof SwooleServerAbstract) {
 			$workerCount = App::$server->setting['worker_num'] + App::$server->setting['task_worker_num'] - 1;
 			for ($workerId = 0; $workerId <= $workerCount; ++$workerId) {
-				App::$server->getServer()->sendMessage($pipeMessage->pack(), $workerId);
+				try {
+					App::$server->getServer()->sendMessage($pipeMessage->pack(), $workerId);
+
+					$this->getEventDispatcher()->dispatch(new ConfigSyncIngEvent($pipeMessage, $workerId));
+				} catch (Throwable $e) {
+					$this->getEventDispatcher()->dispatch(new ConfigSyncExceptionEvent($e, $pipeMessage, $workerId));
+				}
 			}
 		}
 	}

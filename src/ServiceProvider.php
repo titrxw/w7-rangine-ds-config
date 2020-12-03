@@ -16,7 +16,7 @@ class ServiceProvider extends ProviderAbstract {
 		$this->registerServer('ds-config', Server::class);
 
 		$this->container->set('ds-config-fetch', function () {
-			return new ApolloConfigFetcher();
+			return new ApolloConfigFetcher($this->config->get('apollo', []));
 		});
 	}
 }
