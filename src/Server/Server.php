@@ -27,7 +27,7 @@ class Server extends ProcessServerAbstract {
 	}
 
 	public function getType() {
-		return 'ds-config';
+		return 'config';
 	}
 
 	protected function register() {
