@@ -34,6 +34,7 @@ class ApolloConfigFetcher extends ConfigFetcherAbstract {
 			$config = [];
 			foreach ($namespaces as $namespace) {
 				$path = $apollo->getConfigFile($namespace);
+				//在opcache开启时文件变化，include无效
 				if (file_exists($path)) {
 					$config[$namespace] = include $path;
 				}

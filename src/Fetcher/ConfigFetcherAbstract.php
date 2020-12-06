@@ -9,9 +9,7 @@ use W7\Config\Event\ConfigSyncExceptionEvent;
 use W7\Config\Event\ConfigSyncIngEvent;
 use W7\Config\Task\ConfigSyncTask;
 use W7\Core\Helper\Traiter\AppCommonTrait;
-use W7\Core\Process\ProcessAbstract;
 use W7\Core\Process\ProcessServerAbstract;
-use W7\Core\Server\SwooleServerAbstract;
 use W7\Config\Message\ConfigFetchMessage;
 
 abstract class ConfigFetcherAbstract {
@@ -24,31 +22,7 @@ abstract class ConfigFetcherAbstract {
 		$pipeMessage->params['data'] = $data;
 		$pipeMessage->task = ConfigSyncTask::class;
 
-		if (App::$server instanceof ProcessServerAbstract) {
-			/**
-			 * @var ProcessServerAbstract $server
-			 */
-			$server = App::$server;
-			for ($processId = 0; $processId <= $server->getPool()->getProcessFactory()->count(); ++$processId) {
-                /**
-                 * @var ProcessAbstract $process
-                 */
-				$process = $server->getPool()->getProcessFactory()->get($processId);
-                if ($process) {
-                    try {
-                        /**
-                         * @var Socket $socket
-                         */
-                        $socket = $process->getProcess()->exportSocket();
-                        $socket->send($pipeMessage->pack());
-
-                        $this->getEventDispatcher()->dispatch(new ConfigSyncIngEvent($pipeMessage, $processId));
-                    } catch (Throwable $e) {
-                        $this->getEventDispatcher()->dispatch(new ConfigSyncExceptionEvent($e, $pipeMessage, $processId));
-                    }
-                }
-			}
-		} elseif (App::$server instanceof SwooleServerAbstract) {
+		if (!App::$server instanceof ProcessServerAbstract) {
 			$workerCount = App::$server->setting['worker_num'] + App::$server->setting['task_worker_num'] - 1;
 			for ($workerId = 0; $workerId <= $workerCount; ++$workerId) {
 				try {
@@ -60,5 +34,28 @@ abstract class ConfigFetcherAbstract {
 				}
 			}
 		}
+
+        if (!empty(App::$server->processPool)) {
+            for ($processId = 0; $processId < App::$server->processPool->getProcessFactory()->count(); ++$processId) {
+                $process = App::$server->processPool->getProcess($processId);
+                if ($process) {
+                    try {
+                        /**
+                         * @var Socket $socket
+                         */
+                        $socket = $process->getProcess()->exportSocket();
+                        $result = $socket->send($pipeMessage->pack(), 10);
+                        if ($result === false) {
+                            throw new \Exception('Configuration synchronization failed. Please restart the server.');
+                        }
+
+                        $this->getEventDispatcher()->dispatch(new ConfigSyncIngEvent($pipeMessage, $processId));
+                    } catch (Throwable $e) {
+                        $this->getEventDispatcher()->dispatch(new ConfigSyncExceptionEvent($e, $pipeMessage, $processId));
+                    }
+                }
+            }
+        }
+
 	}
 }
