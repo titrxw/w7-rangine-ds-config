@@ -2,12 +2,14 @@
 
 namespace W7\Config\Fetcher;
 
+use Swoole\Coroutine\Socket;
 use Throwable;
 use W7\App;
 use W7\Config\Event\ConfigSyncExceptionEvent;
 use W7\Config\Event\ConfigSyncIngEvent;
 use W7\Config\Task\ConfigSyncTask;
 use W7\Core\Helper\Traiter\AppCommonTrait;
+use W7\Core\Process\ProcessAbstract;
 use W7\Core\Process\ProcessServerAbstract;
 use W7\Core\Server\SwooleServerAbstract;
 use W7\Config\Message\ConfigFetchMessage;
@@ -28,9 +30,23 @@ abstract class ConfigFetcherAbstract {
 			 */
 			$server = App::$server;
 			for ($processId = 0; $processId <= $server->getPool()->getProcessFactory()->count(); ++$processId) {
+                /**
+                 * @var ProcessAbstract $process
+                 */
 				$process = $server->getPool()->getProcessFactory()->get($processId);
-				//待调整，process中暂时没有类似pipMessage的回调
-				$process && $process->sendMsg($pipeMessage->pack());
+                if ($process) {
+                    try {
+                        /**
+                         * @var Socket $socket
+                         */
+                        $socket = $process->getProcess()->exportSocket();
+                        $socket->send($pipeMessage->pack());
+
+                        $this->getEventDispatcher()->dispatch(new ConfigSyncIngEvent($pipeMessage, $processId));
+                    } catch (Throwable $e) {
+                        $this->getEventDispatcher()->dispatch(new ConfigSyncExceptionEvent($e, $pipeMessage, $processId));
+                    }
+                }
 			}
 		} elseif (App::$server instanceof SwooleServerAbstract) {
 			$workerCount = App::$server->setting['worker_num'] + App::$server->setting['task_worker_num'] - 1;
