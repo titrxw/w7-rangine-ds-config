@@ -14,12 +14,13 @@ namespace W7\Config\Listener;
 
 use Swoole\Http\Server;
 use W7\Config\Message\ConfigFetchMessage;
+use W7\Core\Helper\Traiter\TaskDispatchTrait;
 use W7\Core\Listener\ListenerAbstract;
-use W7\Contract\Task\TaskDispatcherInterface;
 use W7\Core\Exception\HandlerExceptions;
-use W7\Core\Message\TaskMessage;
 
 class AfterPipeMessageListener extends ListenerAbstract {
+    use TaskDispatchTrait;
+
 	public function run(...$params) {
 		/**
 		 * @var Server $server
@@ -28,12 +29,7 @@ class AfterPipeMessageListener extends ListenerAbstract {
 
 		if ($message instanceof ConfigFetchMessage) {
 			try {
-				/**
-				 * @var TaskDispatcherInterface $taskDispatcher
-				 */
-				$taskDispatcher = $this->getContainer()->singleton(TaskDispatcherInterface::class);
-				$message->type = TaskMessage::OPERATION_TASK_NOW;
-				$taskDispatcher->dispatch($message, $server, $this->getContext()->getCoroutineId(), $workId);
+			    $this->dispatchNow($message, $server, $workId, $this->getContext()->getCoroutineId());
 			} catch (\Throwable $throwable) {
 				$this->getContainer()->singleton(HandlerExceptions::class)->getHandler()->report($throwable);
 			}
