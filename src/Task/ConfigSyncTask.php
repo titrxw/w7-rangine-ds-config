@@ -11,9 +11,9 @@ class ConfigSyncTask extends TaskAbstract {
 	use AppCommonTrait;
 
 	public function run($server, $taskId, $workId, $data) {
-		foreach ($data['data'] ??[] as $value) {
+		foreach ($data['data'] ??[] as $namespace => $value) {
 			foreach ($value['configurations'] as $key => $configuration) {
-				App::getApp()->getConfigger()->set($key, $configuration);
+				App::getApp()->getConfigger()->set($namespace . '.' . $key, $configuration);
 			}
 		}
 

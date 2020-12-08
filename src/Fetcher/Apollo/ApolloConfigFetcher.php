@@ -25,7 +25,7 @@ class ApolloConfigFetcher extends ConfigFetcherAbstract {
 		}
 
 		//从apollo上拉取的配置默认保存在脚本目录，可自行设置保存目录
-		$apollo->save_dir = RUNTIME_PATH . '/config';
+		$apollo->save_dir = APP_PATH . '/config';
 		if (!is_dir($apollo->save_dir)) {
 			mkdir($apollo->save_dir);
 		}
