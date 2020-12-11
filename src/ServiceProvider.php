@@ -2,7 +2,7 @@
 
 namespace W7\Config;
 
-use W7\Config\Fetcher\ApolloConfigFetcher;
+use W7\Config\Fetcher\Apollo\ApolloConfigFetcher;
 use W7\Config\Listener\AfterPipeMessageListener;
 use W7\Config\Server\Server;
 use W7\Core\Provider\ProviderAbstract;
