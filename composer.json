@@ -1,8 +1,10 @@
 {
 	"name": "w7/rangine-ds-config",
 	"description": "A Rangine vendor.",
+	"type": "library",
 	"keywords": [
-		"rangine"
+		"rangine",
+		"mq"
 	],
 	"license": "Apache-2.0",
 	"require": {
