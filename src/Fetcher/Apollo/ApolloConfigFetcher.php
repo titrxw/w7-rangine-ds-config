@@ -7,12 +7,6 @@ use W7\Config\Event\ConfigFetchedEvent;
 use W7\Config\Fetcher\ConfigFetcherAbstract;
 
 class ApolloConfigFetcher extends ConfigFetcherAbstract {
-	protected $config;
-
-	public function __construct(array $config) {
-		$this->config = $config;
-	}
-
 	public function fetch() {
 		$namespaces = (array)$this->config['namespace'];
 		$apollo = new ApolloClient($this->config['server'], $this->config['app_id'], $namespaces);
@@ -35,7 +29,7 @@ class ApolloConfigFetcher extends ConfigFetcherAbstract {
 			$config = [];
 			foreach ($namespaces as $namespace) {
 				$path = $apollo->getConfigFile($namespace);
-				//在opcache开启时文件变化，include无效
+				//在opcache开启时文件变化，include无效ß
 				if (file_exists($path)) {
 					$config[$namespace] = include $path;
 					$content = '<?php return '.var_export($config[$namespace]['configurations'] ?? [], true).';';

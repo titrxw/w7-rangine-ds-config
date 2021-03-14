@@ -15,6 +15,12 @@ use W7\Config\Message\ConfigFetchMessage;
 abstract class ConfigFetcherAbstract {
 	use AppCommonTrait;
 
+    protected $config;
+
+    public function __construct(array $config) {
+        $this->config = $config;
+    }
+
 	abstract public function fetch();
 
 	protected function syncConfig(array $data) {
