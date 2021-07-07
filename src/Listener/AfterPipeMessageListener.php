@@ -31,7 +31,7 @@ class AfterPipeMessageListener extends ListenerAbstract {
 			try {
 			    $this->dispatchNow($message, $server, $workId, $this->getContext()->getCoroutineId());
 			} catch (\Throwable $throwable) {
-				$this->getContainer()->singleton(HandlerExceptions::class)->getHandler()->report($throwable);
+				$this->getContainer()->get(HandlerExceptions::class)->getHandler()->report($throwable);
 			}
 		}
 	}

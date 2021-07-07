@@ -26,7 +26,7 @@ class ConfigFetchProcess extends ProcessAbstract {
 		/**
 		 * @var ConfigFetcherAbstract $dsConfigFetcher
 		 */
-		$dsConfigFetcher = $this->getContainer()->singleton('ds-config-fetch');
+		$dsConfigFetcher = $this->getContainer()->get('ds-config-fetch');
 		$dsConfigFetcher->fetch();
 	}
 }
